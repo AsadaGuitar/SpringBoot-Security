@@ -14,10 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.servise.AccountUserDetailsService;
 
 /**
- * 
+ *
  *  SecurityFilterChainインターフェイスの実装。
  *  デフォルトではDefaultSecurityFilterChainクラス
- *  
+ *
  * @author JavaUser
  */
 
@@ -27,24 +27,21 @@ public class SecurityConfiguration {
 	@Configuration
 	@Order(1)
 	public static class UiWebSecurityConfig extends WebSecurityConfigurerAdapter{
-		
+
 		@Override
 		protected void configure(HttpSecurity http) throws Exception{
 			http.antMatcher("/css/**");
 		}
 	}
-	
+
 	@Configuration
 	@Order(2)
 	public static class ApiWebSecurityConfig extends WebSecurityConfigurerAdapter{
-		
-		@Autowired
-		AccountUserDetailsService accountUserDetailsServise;
-		
+
 		//デフォルトでは認証成功時のレスポンスは、一度アクセスを拒否したパス
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			
+
 			http.formLogin() //フォーム認証の適用
 				.loginPage("/loginForm").permitAll() //"/loginFrom"へのアクセスを許可
 				.loginProcessingUrl("/authenticate") //認証パスを指定
@@ -52,36 +49,19 @@ public class SecurityConfiguration {
 				.passwordParameter("password") //資格情報のパラメータを指定
 				.defaultSuccessUrl("/Success", true).permitAll() //成功場合のパス
 				.failureForwardUrl("/loginForm?error").permitAll(); //失敗時のパス
-						
+
 			http.logout()
 				.logoutSuccessUrl("/loginForm").permitAll();
-				
+
 			http.authorizeRequests() //リクエストを制限
 				.anyRequest().authenticated(); //全てのURLリクエストを認証されたユーザーにのみ使用可能にする
 		}
-		
-		//DaoAuthenticationProviderを有効化する。
-		@Autowired
-		void configurerAuthenticationManager(AuthenticationManagerBuilder auth) throws Exception{
-			auth.userDetailsService(accountUserDetailsServise).passwordEncoder(passwordEncoder());
-		}
-		
+
+
 		@Bean
 		PasswordEncoder passwordEncoder() {
 			return new BCryptPasswordEncoder();
 		}
-		
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
