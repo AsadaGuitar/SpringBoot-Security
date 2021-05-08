@@ -38,8 +38,8 @@ public class SecurityConfiguration {
 	@Order(2)
 	public static class ApiWebSecurityConfig extends WebSecurityConfigurerAdapter{
 		
-		@Autowired
-		AccountUserDetailsService accountUserDetailsServise;
+//		@Autowired
+//		AccountUserDetailsService accountUserDetailsServise;
 		
 		//デフォルトでは認証成功時のレスポンスは、一度アクセスを拒否したパス
 		@Override
@@ -48,10 +48,10 @@ public class SecurityConfiguration {
 			http.formLogin() //フォーム認証の適用
 				.loginPage("/loginForm").permitAll() //"/loginFrom"へのアクセスを許可
 				.loginProcessingUrl("/authenticate") //認証パスを指定
-				.usernameParameter("username") // html の　input nameを取得
+				.usernameParameter("username") // HTML の input nameを取得
 				.passwordParameter("password") //資格情報のパラメータを指定
-				.defaultSuccessUrl("/Success", true).permitAll() //成功場合のパス
-				.failureForwardUrl("/loginForm?error").permitAll(); //失敗時のパス
+				.defaultSuccessUrl("/Success", true) //成功場合のパス
+				.failureForwardUrl("/errorForm"); //失敗時のパス
 						
 			http.logout()
 				.logoutSuccessUrl("/loginForm").permitAll();
@@ -60,11 +60,16 @@ public class SecurityConfiguration {
 				.anyRequest().authenticated(); //全てのURLリクエストを認証されたユーザーにのみ使用可能にする
 		}
 		
-		//DaoAuthenticationProviderを有効化する。
-		@Autowired
-		void configurerAuthenticationManager(AuthenticationManagerBuilder auth) throws Exception{
-			auth.userDetailsService(accountUserDetailsServise).passwordEncoder(passwordEncoder());
-		}
+		/**
+		 * DaoAuthenticationProviderを有効化する。
+		 * PasswordEncoderとUserDetailsServiceがBean登録されている場合は必要無い。
+		 * 
+		 * @return
+		 */
+//		@Autowired
+//		void configurerAuthenticationManager(AuthenticationManagerBuilder auth) throws Exception{
+//			auth.userDetailsService(accountUserDetailsServise).passwordEncoder(passwordEncoder());
+//		}
 		
 		@Bean
 		PasswordEncoder passwordEncoder() {
@@ -72,12 +77,6 @@ public class SecurityConfiguration {
 		}
 		
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 	

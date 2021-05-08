@@ -3,6 +3,7 @@ package com.example.dao;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,7 +22,13 @@ public class AccountDaoImpl implements AccountDao{
 	@Override
 	public Account findOne(String id) {
 		var sql = "select * from spring where id = ?";
-		return jdbcTemplate.queryForObject(sql, rowMapper, id);
+		try {
+			return jdbcTemplate.queryForObject(sql, rowMapper, id);
+		}
+		catch(IncorrectResultSizeDataAccessException e) {
+			return null;
+		}
+
 	}
 
 	@Override

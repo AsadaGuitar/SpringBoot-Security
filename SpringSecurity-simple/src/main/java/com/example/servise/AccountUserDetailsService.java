@@ -1,7 +1,6 @@
 package com.example.servise;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,9 +14,17 @@ import com.example.dao.AccountDao;
 import com.example.dao.DaoFactory;
 import com.example.domain.Account;
 
+/**
+ * フォームから名前を受け取りUserDetailsを返すサービスクラス
+ * 見つからなかった際のレスポンス定義などはここで行う。
+ * 
+ * @author JavaUser
+ *
+ */
 @Service
 public class AccountUserDetailsService implements UserDetailsService{
 	
+	//DBアクセスクラスを依存注入
 	@Autowired
 	DaoFactory daoFactory;
 
@@ -25,11 +32,14 @@ public class AccountUserDetailsService implements UserDetailsService{
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		AccountDao dao = daoFactory.getAccountDao();
-		Account account = Optional.ofNullable(dao.findOne(username))
-				.orElseThrow(() -> new UsernameNotFoundException("user not found."));
+		Account account = dao.findOne(username);
+		
+		if(account == null) 
+			throw new UsernameNotFoundException(username + "is not found.");
 		return new AccountUserDetails(account, getAuthorities(account));
 	}
 	
+	//ロール情報をリクエストに応じて作成
 	private Collection<GrantedAuthority> getAuthorities(Account account){
 		
 		if(account.isAdmin())
